@@ -1,0 +1,48 @@
+import time
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+def check_saturday_ticket():
+    url = "https://www.hellfest.fr/billetterie/"
+
+    # Configuration du navigateur
+    options = webdriver.ChromeOptions()
+    options.add_argument('--headless')  # Pour exécuter le navigateur en arrière-plan
+    driver = webdriver.Chrome(options=options)
+
+    try:
+        while True:
+            # Charger la page
+            driver.get(url)
+
+            # Attendre que le bouton de réservation pour le samedi 29 juin soit visible
+            saturday_button = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.XPATH, "//div[@data-datetime='2019-06-29']/button"))
+            )
+
+            # Cliquer sur le bouton de réservation pour le samedi 29 juin
+            saturday_button.click()
+
+            # Attendre quelques secondes pour que la page se charge
+            time.sleep(5)
+
+            # Extraire les informations pertinentes
+            ticket_info = driver.find_element_by_class_name('ticket-info')
+            ticket_availability = ticket_info.find_element_by_class_name('ticket-availability').text.strip()
+            ticket_price = ticket_info.find_element_by_class_name('ticket-price').text.strip()
+
+            print("Disponibilité des billets pour le samedi 29 juin:", ticket_availability)
+            print("Prix des billets pour le samedi 29 juin:", ticket_price)
+
+            # Rafraîchir toutes les 0.5 secondes
+            time.sleep(0.5)
+
+    except KeyboardInterrupt:
+        print("Arrêt du programme.")
+        driver.quit()
+
+# Appel de la fonction
+check_saturday_ticket()
+
